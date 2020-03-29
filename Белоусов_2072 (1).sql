@@ -176,8 +176,7 @@ AND st.score >
 
 SELECT st.*,
        EXTRACT (MONTH
-                FROM age(sh.date_finish, sh.date_start)) + extract(YEAR
-                                                                   FROM age(sh.date_finish, sh.date_start)*12) +EXTRACT (YEAR
+                FROM age(sh.date_finish, sh.date_start)) + extract(YEAR FROM age(sh.date_finish, sh.date_start)*12) +EXTRACT (YEAR
                                                                                                                          FROM now())*12
 FROM students st
 INNER JOIN students_hobbies sh ON st.id = sh.student_id
@@ -193,7 +192,7 @@ INNER JOIN
    FROM StUDENTS_HOBBIES sh
    WHERE sh.date_finish IS NULL
    GROUP BY sh.student_id
-   HAVING count(*)>1) t ON st.id = t.student_id; -- таблицу соединили с результатом запроса (для нескольких значений лучше использовать эту конструкцию)
+   HAVING count(*)>1) t ON st.id = t.student_id; 
 --6)Найти средний балл в каждой группе, учитывая только баллы студентов, которые имеют хотя бы одно действующее хобби.
 
 SELECT n_group,
@@ -208,8 +207,7 @@ GROUP BY n_group;
 SELECT h.name,
        h.risk,
        extract(YEAR
-               FROM age(sh.date_finish, sh.date_start))*12 + extract(MONTH
-                                                                     FROM age(sh.date_finish, sh.date_start))
+               FROM age(sh.date_finish, sh.date_start))*12 + extract(MONTH FROM age(sh.date_finish, sh.date_start))
 FROM hobbies h
 INNER JOIN students_hobbies sh ON h.id = sh.hobby_id
 INNER JOIN students st ON sh.student_id = st.id
@@ -249,6 +247,7 @@ GROUP BY SUBSTRING (st.n_group::varchar, 1, 1),st.surname,
                        st.n_group;
 
 --10)Найти номера курсов, на которых более 50% студентов имеют более одного действующего хобби.
+
 WITH all_students AS
   (SELECT SUBSTRING (st.n_group::varchar, 1, 1) AS course,
                     COUNT(st.id)::real AS c
@@ -265,6 +264,7 @@ SELECT a_s.course
 FROM all_students a_s
 INNER JOIN STUDENTS_WITH_HOBBIES swh ON a_s.course = swh.course
 WHERE swh.c/a_s.c>0.3;
+
 --11)Вывести номера групп, в которых не менее 60% студентов имеют балл не ниже 4.
 
   SELECT st.n_group
@@ -274,6 +274,7 @@ WHERE swh.c/a_s.c>0.3;
      FROM students st
      WHERE st.score > 4 ) t ON st.n_group = t.n_group WHERE t.n_group/st.n_group>0.6
 GROUP BY st.n_group ;
+
 --12)Для каждого курса подсчитать количество различных действующих хобби на курсе.
 
 SELECT SUBSTRING (st.n_group::varchar, 1, 1) AS course,
@@ -282,6 +283,7 @@ FROM students st
 INNER JOIN students_hobbies sh ON st.id = sh.student_id
 WHERE sh.date_finish IS NULL
 GROUP BY SUBSTRING (st.n_group::varchar, 1, 1);
+
 --13)Вывести номер зачётки, фамилию и имя, дату рождения и номер курса для всех отличников, не имеющих хобби.
 --Отсортировать данные по возрастанию в пределах курса по убыванию даты рождения.
 
@@ -298,15 +300,16 @@ ORDER BY st.birth_date DESC;
 
 --14)Создать представление, в котором отображается вся информация о студентах,
 -- которые продолжают заниматься хобби в данный момент и занимаются им как минимум 5 лет.
-WITH all_students AS
-  (SELECT st.*
-   FROM students st
-   INNER JOIN students_hobbies sh ON st.id = sh.student_id
-   WHERE sh.date_finish IS NULL
-     AND age (sh.date_finish, sh.date_start) >5 YEAR )
-SELECT a_s.*
-FROM all_students a_s 
--- как выставить больше 5 лет?
+
+SELECT st.*,
+       extract(YEAR
+               FROM age(sh.date_finish, sh.date_start))
+FROM students st
+INNER JOIN students_hobbies sh ON st.id = sh.student_id
+WHERE extract(YEAR
+              FROM age(sh.date_finish, sh.date_start)) >5
+ORDER BY sh.date_start;
+
 --15) Для каждого хобби вывести количество людей, которые им занимаются.
 
 SELECT count(st.id) AS id,
@@ -342,7 +345,8 @@ INNER JOIN
    WHERE sh.date_finish IS NULL
    GROUP BY sh.hobby_id
    ORDER BY c DESC
-   LIMIT 1)p_h ON p_h.hobby_id = sh.hobby_id;
+   LIMIT 1
+	)p_h ON p_h.hobby_id = sh.hobby_id;
 
 --18)Вывести ИД 3х хобби с максимальным риском.
 
@@ -358,23 +362,26 @@ LIMIT 3;
 SELECT *
 FROM students st
 INNER JOIN students_hobbies sh ON st.id = sh.student_id
-WHERE sh.date_finish IS NOT NULL
-  AND CASE
-          WHEN sh.date_finish IS NULL THEN age(now(), date_start) =
-                 (SELECT (age (sh.date_finish, sh.date_start))
-                  FROM students_hobbies sh
-                  ORDER BY age(now(), date_start) DESC
-                  LIMIT 10)
-          ELSE age (sh.date_finish, sh.date_start) =
-                 (SELECT (age (sh.date_finish, sh.date_start))
-                  FROM students_hobbies sh
-                  ORDER BY age(now(), date_start) DESC
-                  LIMIT 10)
-      END 
---как сделать последних 10 если у нас тут стояло максимальное значение даты?
+WHERE sh.date_finish IS NULL
+ORDER BY sh.date_start
+LIMIT 10;
+
 --20)Вывести номера групп (без повторений), в которых учатся студенты из предыдущего запроса.
 
+SELECT st.n_group
+FROM students st
+INNER JOIN
+  (SELECT *
+   FROM students st
+   INNER JOIN students_hobbies sh ON st.id = sh.student_id
+   WHERE sh.date_finish IS NULL
+   ORDER BY sh.date_start
+   LIMIT 10
+   ) t ON st.n_group = t.n_group
+GROUP BY st.n_group;
+
  --21)Создать представление, которое выводит номер зачетки, имя и фамилию студентов, отсортированных по убыванию среднего балла.
+
 WITH all_students AS
     (SELECT st.name,
             st.surname,
@@ -386,29 +393,59 @@ WITH all_students AS
      ORDER BY score DESC)
   SELECT a_s.*
   FROM all_students a_s;
+
 --22)Представление: найти каждое популярное хобби на каждом курсе.
-WITH popular AS
-    (SELECT count(sh.student_id) AS id,
-            h.name
-     FROM students st
-     INNER JOIN students_hobbies sh ON st.id = sh.student_id
-     INNER JOIN hobbies h ON sh.hobby_id = h.id
-     GROUP BY hobby_id,
-              h.name
-     ORDER BY id DESC
-     LIMIT 1),
-     courses AS
-    (SELECT SUBSTRING (st.n_group::varchar, 1, 1) AS course
-     FROM students st
-     INNER JOIN students_hobbies sh ON st.id = sh.student_id
-     GROUP BY SUBSTRING (st.n_group::varchar, 1, 1))
-  SELECT pop.*
-  FROM popular pop
-  INNER JOIN courses c ON pop.id=c.course ;
-  --неправильная свзязь
+
+WITH c_hobbies AS
+  (SELECT substr(st.n_group::varchar, 1, 1) AS course,
+          sh.hobby_id,
+          count(*) AS c
+   FROM students st
+   INNER JOIN students_hobbies sh ON st.id = sh.student_id
+   GROUP BY substr(st.n_group::varchar, 1, 1),
+            sh.hobby_id),  max_for_course AS (
+SELECT c_h.course,
+   max(c) AS max_c
+   FROM c_hobbies c_h
+   GROUP BY c_h.course
+   )
+SELECT c_h.course,
+       c_h.hobby_id
+FROM c_hobbies c_h
+INNER JOIN max_for_course mfc ON c_h.course = mfc.course
+AND c_h.c = mfc.max_c;
+
  --23)Представление: найти хобби с максимальным риском среди самых популярных хобби на 2 курсе.
 
+WITH c_hobbies AS
+  (SELECT substr(st.n_group::varchar, 1, 1) AS course,
+          sh.hobby_id,
+          count(*) AS c,
+          MAX(h.risk)
+   FROM students st
+   INNER JOIN students_hobbies sh ON st.id = sh.student_id
+   INNER JOIN hobbies h ON sh.hobby_id = h.id
+   WHERE substr(st.n_group::varchar, 1, 1) = '2'
+   GROUP BY substr(st.n_group::varchar, 1, 1),
+            sh.hobby_id
+   HAVING MAX(h.risk) > 8
+   ), max_for_course AS
+  (SELECT c_h.course,
+          c_h.c
+   FROM c_hobbies c_h
+   GROUP BY c_h.course,
+            c_h.c
+   ORDER BY c_h.c DESC
+   LIMIT 1
+   )
+SELECT c_h.course,
+       c_h.hobby_id
+FROM c_hobbies c_h
+INNER JOIN max_for_course mfc ON c_h.course = mfc.course
+AND c_h.c = c_h.c;
+
  --24)Представление: для каждого курса подсчитать количество студентов на курсе и количество отличников.
+
 WITH all_students AS
     (SELECT SUBSTRING (st.n_group::varchar, 1, 1) AS course,
                       COUNT(st.id)::real AS c
@@ -425,33 +462,50 @@ WITH all_students AS
   INNER JOIN STUDENTS_otl swh ON a_s.course = swh.course;
 --25)Представление: самое популярное хобби среди всех студентов.
 WITH all_students AS
-    (SELECT COUNT(st.id) AS c
-     FROM students st),
-     popular AS
-    (SELECT count(sh.student_id) AS id,
+  (SELECT st.*
+   FROM students st
+   INNER JOIN students_hobbies sh ON st.id = sh.student_id
+    ), popular AS
+  (SELECT count(sh.student_id) AS id,
+          h.name
+   FROM students st
+   INNER JOIN students_hobbies sh ON st.id = sh.student_id
+   INNER JOIN hobbies h ON sh.hobby_id = h.id
+   GROUP BY hobby_id,
             h.name
-     FROM students st
-     INNER JOIN students_hobbies sh ON st.id = sh.student_id
-     INNER JOIN hobbies h ON sh.hobby_id = h.id
-     GROUP BY hobby_id,
-              h.name
-     ORDER BY id DESC
-     LIMIT 1)
-  SELECT pop.id,
-         pop.name
-  FROM all_students a_s
-  INNER JOIN popular pop ON a_s.c = pop.id;
---не работает
+   ORDER BY id DESC
+   LIMIT 1
+   )
+SELECT pop.id,
+       pop.name
+FROM all_students a_s
+INNER JOIN popular pop ON a_s.id = pop.id;
+
 --26)Создать обновляемое представление.
 
  --27)Для каждой буквы алфавита из имени найти максимальный, средний и минимальный балл.
 --(Т.е. среди всех студентов, чьё имя начинается на А (Алексей, Алина, Артур, Анджела)
 --найти то, что указано в задании. Вывести на экран тех, максимальный балл которых больше 3.6
 
+SELECT SUBSTRING (st.name, 1, 1), max(st.score),
+                      min(st.score),
+                      avg(st.score)
+FROM students st
+INNER JOIN students_hobbies sh ON st.id = sh.student_id
+GROUP BY SUBSTRING (st.name, 1, 1)
+HAVING MAX(st.score) > 3.6;
+
  --28)Для каждой фамилии на курсе вывести максимальный и минимальный средний балл.
 -- (Например, в университете учатся 4 Иванова (1-2-3-4). 1-2-3 учатся на 2 курсе и имеют средний балл 4.1,
 -- 4, 3.8 соответственно, а 4 Иванов учится на 3 курсе и имеет балл 4.5. На экране должно быть следующее:
 -- 2 Иванов 4.1 3.8 3 Иванов 4.5 4.5)
+
+SELECT SUBSTRING (st.n_group::varchar, 1, 1) AS course,
+                 SUBSTRING (st.surname,  1, 1), max(st.score),
+                                min(st.score)
+FROM students st
+INNER JOIN students_hobbies sh ON st.id = sh.student_id
+GROUP BY SUBSTRING (st.n_group::varchar,  1, 1),SUBSTRING (st.surname,  1, 1);
 
  --29)Для каждого года рождения подсчитать количество хобби, которыми занимаются или занимались студенты.
 
@@ -460,6 +514,7 @@ WITH all_students AS
   FROM students st
   INNER JOIN students_hobbies sh ON st.id = sh.student_id
 GROUP BY st.birth_date ;
+
 --30)Для каждой буквы алфавита в имени найти максимальный и минимальный риск хобби.
 
 SELECT SUBSTRING (st.name, 1, 1), max(h.risk),
@@ -467,11 +522,28 @@ SELECT SUBSTRING (st.name, 1, 1), max(h.risk),
 FROM students st
 INNER JOIN students_hobbies sh ON st.id = sh.student_id
 INNER JOIN hobbies h ON sh.hobby_id = h.id
-GROUP BY SUBSTRING (st.name, 1, 1)
-HAVING max(h.risk) =
-  (SELECT MAX(h.risk)
-   FROM hobbies h)
-OR min(h.risk) =
-  (SELECT min(h.risk)
-   FROM hobbies h);
---ошибка с нахождением мин и макс
+GROUP BY SUBSTRING (st.name, 1, 1);
+
+--31)Для каждого месяца из даты рождения вывести средний балл студентов, которые занимаются хобби с названием «Футбол»
+
+SELECT extract(MONTH FROM(st.birth_date)),
+       avg(st.score)
+FROM students st
+INNER JOIN students_hobbies sh ON st.id = sh.student_id
+INNER JOIN hobbies h ON sh.hobby_id = h.id
+WHERE h.name = 'Футбол'
+GROUP BY extract(MONTH FROM(st.birth_date));
+
+--32)Вывести информацию о студентах, которые занимались или занимаются хотя бы 1 хобби в следующем формате:
+-- Имя: Иван, фамилия: Иванов, группа: 1234
+
+SELECT CONCAT(st.name,' ', st.surname, ' ',st.n_group)
+FROM students st;
+
+--33)Найдите в фамилии в каком по счёту символа встречается «ов». Если 0 
+--(т.е. не встречается, то выведите на экран «не найдено».
+
+SELECT st.surname,
+CASE WHEN position('ов' in  st.surname)::varchar = '0' THEN 'не найдено'
+	ELSE position('ов' in  st.surname)::varchar END AS pos
+FROM students st;
