@@ -482,7 +482,11 @@ FROM all_students a_s
 INNER JOIN popular pop ON a_s.id = pop.id;
 
 --26)Создать обновляемое представление.
-
+/*CREATE VIEW view_lev2 AS (
+SELECT 'now'::timestamp, now()
+)*/
+SELECT *
+FROM view_lev2;
  --27)Для каждой буквы алфавита из имени найти максимальный, средний и минимальный балл.
 --(Т.е. среди всех студентов, чьё имя начинается на А (Алексей, Алина, Артур, Анджела)
 --найти то, что указано в задании. Вывести на экран тех, максимальный балл которых больше 3.6
@@ -547,3 +551,14 @@ SELECT st.surname,
 CASE WHEN position('ов' in  st.surname)::varchar = '0' THEN 'не найдено'
 	ELSE position('ов' in  st.surname)::varchar END AS pos
 FROM students st;
+--34)Дополните фамилию справа символом # до 10 символов.
+SELECT *
+FROM view_lev4;
+/*CREATE VIEW view_lev4 AS (
+SELECT RPAD(st.surname, 10, '#')
+FROM students st
+)*/
+--35)При помощи функции удалите все символы # из предыдущего запроса.
+SELECT trim(rpad, '#')
+from
+view_lev4;
