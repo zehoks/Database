@@ -505,11 +505,12 @@ HAVING MAX(st.score) > 3.6;
 -- 2 Иванов 4.1 3.8 3 Иванов 4.5 4.5)
 
 SELECT SUBSTRING (st.n_group::varchar, 1, 1) AS course,
-                 SUBSTRING (st.surname,  1, 1), max(st.score),
-                                min(st.score)
+                 substring(st.surname, 1, 1),
+                 max(st.score),
+                 min(st.score),
+                 count(*)
 FROM students st
-INNER JOIN students_hobbies sh ON st.id = sh.student_id
-GROUP BY SUBSTRING (st.n_group::varchar,  1, 1),SUBSTRING (st.surname,  1, 1);
+GROUP BY SUBSTRING (st.n_group::varchar, 1, 1), st.surname
 
  --29)Для каждого года рождения подсчитать количество хобби, которыми занимаются или занимались студенты.
 
@@ -542,7 +543,9 @@ GROUP BY extract(MONTH FROM(st.birth_date));
 -- Имя: Иван, фамилия: Иванов, группа: 1234
 
 SELECT CONCAT(st.name,' ', st.surname, ' ',st.n_group)
-FROM students st;
+FROM students st
+INNER JOIN students_hobbies sh
+ON st.id = sh.student_id;
 
 --33)Найдите в фамилии в каком по счёту символа встречается «ов». Если 0 
 --(т.е. не встречается, то выведите на экран «не найдено».
@@ -551,6 +554,7 @@ SELECT st.surname,
 CASE WHEN position('ов' in  st.surname)::varchar = '0' THEN 'не найдено'
 	ELSE position('ов' in  st.surname)::varchar END AS pos
 FROM students st;
+
 --34)Дополните фамилию справа символом # до 10 символов.
 SELECT *
 FROM view_lev4;
@@ -558,7 +562,37 @@ FROM view_lev4;
 SELECT RPAD(st.surname, 10, '#')
 FROM students st
 )*/
+
 --35)При помощи функции удалите все символы # из предыдущего запроса.
+
 SELECT trim(rpad, '#')
 from
 view_lev4;
+
+--36) Выведите на экран сколько дней в апреле 2018 года.
+
+SELECT '2018-05-01'::TIMESTAMP - '2018-04-01'::TIMESTAMP;
+
+--37)Выведите на экран какого числа будет ближайшая суббота.
+
+SELECT 'TOMORROW'::date + ( 6 + 7 - extract ( dow FROM 'TOMORROW'::date))::int%7;
+
+--38)Выведите на экран век, а также какая сейчас неделя года и день года.
+
+SELECT EXTRACT(century FROM now()) as century ,
+	EXTRACT(WEEK FROM NOW()) as week,
+	 EXTRACT(doy FROM now()) as dayofyear ;
+
+--39)Выведите всех студентов, которые занимались или занимаются хотя бы 1 хобби. Выведите на экран Имя, Фамилию, Названию хобби,
+-- а также надпись «занимается», если студент продолжает заниматься хобби в данный момент или «закончил», если уже не занимает.
+
+SELECT st.name,
+       st.surname,
+       h.name,
+       CASE
+           WHEN sh.date_finish IS NULL THEN 'занимается'
+           ELSE 'закончил'
+       END
+FROM students st
+INNER JOIN students_hobbies sh ON st.id = sh.student_id
+INNER JOIN hobbies h ON sh.hobby_id = h.id;
