@@ -596,3 +596,156 @@ SELECT st.name,
 FROM students st
 INNER JOIN students_hobbies sh ON st.id = sh.student_id
 INNER JOIN hobbies h ON sh.hobby_id = h.id;
+
+
+
+--Создание таблиц по спроектированной модели и заполнение их данными
+
+CREATE TABLE store (
+id serial PRIMARY KEY,
+name varchar(255),
+postal_code bigint,
+open_date time(6),
+close_date time(6) NULL,
+id_supplier serial,
+adress varchar(255)
+);
+ALTER TABLE store DROP COLUMN id_supplier;
+-------
+CREATE TABLE department (
+id serial PRIMARY KEY,
+name varchar(255),
+description varchar(255),
+adress varchar(255),
+open_date time(6),
+close_date time(6) NULL
+);
+
+CREATE TABLE store_department (
+department_id bigint,
+store_id integer,
+PRIMARY KEY(department_id, store_id)
+);
+
+CREATE TABLE unit (
+id serial PRIMARY KEY,
+name varchar(255),
+description varchar(255),
+kind_of_activity integer,
+open_date time(6),
+close_date time(6) NULL,
+department_id integer REFERENCES department (id)
+/*CONSTRAINT  unit_department_id FOREIGN KEY (department_id)
+ REFERENCES department (id) MATCH SIMPLE*/
+/*ON UPDATE NO ACTION
+/*ON DELETE CASCADE*/--сносит все ссылки
+/*ON DELETE set null*/--полезен при хранении статистики
+ON DELETE NO ACTION*/
+);
+
+CREATE TABLE worker (
+id serial PRIMARY KEY,
+name varchar(255),
+surname varchar(255),
+position varchar(255),
+registration bigint UNIQUE,
+number_phone bigint UNIQUE,
+email varchar(255)UNIQUE,
+birth_day time(6),
+unit_id integer REFERENCES unit (id)
+);
+-------
+CREATE TABLE supplier (
+id serial PRIMARY KEY,
+name varchar(255),
+adress integer,
+availability varchar(255) NULL,
+inn integer UNIQUE
+);
+
+CREATE TABLE registration_product (
+id serial PRIMARY KEY,
+information varchar(255),
+waybill integer UNIQUE,
+requisites varchar(255) UNIQUE,
+worker_id integer REFERENCES worker (id),
+store_id integer REFERENCES store (id),
+supplier_id integer REFERENCES supplier (id)
+);
+
+-------
+CREATE TABLE product (
+id serial PRIMARY KEY,
+name varchar(255),
+type integer,
+price bigint,
+description varchar(255),
+weight integer,
+size integer
+);
+
+CREATE TABLE product_in_store (
+store_id integer,
+product_id integer,
+PRIMARY KEY(store_id, product_id )
+);
+
+CREATE TABLE product_attribute (
+id serial PRIMARY KEY,
+attribute varchar(255),
+value varchar(100),
+product_id integer REFERENCES product (id)
+);
+----
+CREATE TABLE client (
+id serial PRIMARY KEY,
+name varchar(255),
+surname varchar(255),
+email varchar(255) NULL UNIQUE,
+phone bigint NULL UNIQUE,
+birth_day time(6),
+gender char(1) NULL
+);
+
+CREATE TABLE purchase(
+id serial PRIMARY KEY,
+date timestamp,
+list_product varchar(255),
+playment_method varchar(255),
+client_id integer REFERENCES client (id)
+);
+
+CREATE TABLE purchase_product (
+amount integer,
+purchase_id integer,
+product_id integer,
+PRIMARY KEY(purchase_id , product_id)
+);
+----
+CREATE TABLE discount (
+id serial PRIMARY KEY,
+name varchar(255),
+description varchar(255),
+type varchar(255),
+product_id integer REFERENCES product (id)
+);
+
+CREATE TABLE loyalty_card (
+id serial PRIMARY KEY,
+name varchar(255),
+create_data timestamp,
+amount_of_expenses bigint,
+card_expiration_date time(6),
+discount_id integer REFERENCES discount (id)
+);
+
+CREATE TABLE special_discount (
+id serial PRIMARY KEY,
+name varchar(255),
+description varchar(255),
+access_for_client varchar(255) UNIQUE,
+loyalty_card_id integer REFERENCES loyalty_card (id)
+);
+
+
+
