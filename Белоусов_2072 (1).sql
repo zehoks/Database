@@ -640,7 +640,7 @@ department_id integer REFERENCES department (id)
 /*ON UPDATE NO ACTION
 /*ON DELETE CASCADE*/--сносит все ссылки
 /*ON DELETE set null*/--полезен при хранении статистики
-ON DELETE NO ACTION*/
+/*ON DELETE NO ACTION*/
 );
 
 CREATE TABLE worker (
