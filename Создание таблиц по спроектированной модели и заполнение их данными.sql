@@ -513,27 +513,34 @@ ORDER BY max(cwp.s) DESC
 
 -- 6) «а последние 4 недели выведите проданное количество единиц товара (¬ формате: ID, Ќазвание товара, 1,2,3, 4 недели).
 
-select pr.id, pr.name, pp.amount, pu.date,pu.date > now()::date - (11140/24)::integer as "1",
-    pu.date > now()::date - (11040/24)::integer as "2", pu.date > now()::date - (10000/24)::integer as "3",
-    pu.date > now()::date - (9000/24)::integer as "4"
-	from product pr
-	inner join purchase_product pp ON pr.id = pp.purchase_id
-	inner join purchase pu ON pp.purchase_id = pu.id
+SELECT pr.id,
+       pr.name,
+       CASE
+           WHEN pu.date < now()  AND pu.date > now()::date - (7)::integer THEN pp.amount
+       END AS "1 недел€",
+       CASE
+           WHEN pu.date < now()::date - (7)::integer AND pu.date > now()::date - (14)::integer THEN pp.amount
+       END AS "2 недел€",
+       CASE
+           WHEN pu.date < now()::date - (14)::integer AND pu.date > now()::date - (21)::integer THEN pp.amount
+       END AS "3 недел€",
+       CASE
+           WHEN pu.date < now()::date - (21)::integer AND pu.date > now()::date - (28)::integer THEN pp.amount
+       END AS "4 недел€"
+FROM product pr
+INNER JOIN purchase_product pp ON pr.id = pp.purchase_id
+INNER JOIN purchase pu ON pp.purchase_id = pu.id
+--там все даты заказов были в 19 году
+
 -- 7) —равните количество единиц товара на складе с полученными в результате предыдущего запроса данными. ¬ывести нужно те товары и их количество, которого не хватит на неделю исход€ из статистики 4-х прошедших недель
 
 SELECT rp.information,
        rp.waybill
-FROM store st
-INNER JOIN registration_product rp ON st.id = rp.store_id
+FROM registration_product rp
 INNER JOIN
   (SELECT pr.id,
           pr.name,
-          pp.amount AS amount,
-          pu.date,
-          pu.date > now()::date - (11140/24)::integer AS "1",
-          pu.date > now()::date - (11040/24)::integer AS "2",
-          pu.date > now()::date - (10000/24)::integer AS "3",
-          pu.date > now()::date - (9000/24)::integer AS "4"
+          pp.amount AS amount
    FROM product pr
    INNER JOIN purchase_product pp ON pr.id = pp.purchase_id
    INNER JOIN purchase pu ON pp.purchase_id = pu.id) t ON rp.waybill = t.amount
@@ -560,7 +567,18 @@ INNER JOIN purchase pu ON  cl.id = pu.client_id
 -- 11)  лиент может отказатьс€ от карты ло€льности, в таком случае, согласно GDPR хранить его данные нельз€.
 -- ќбъ€сните, как правильно организовать такое удаление, напишите запрос(ы).
 
---
+DELETE
+FROM client
+WHERE id = '1';
+
+DELETE
+FROM purchase
+WHERE client_id = '1';
+
+DELETE
+FROM purchase_product
+WHERE purchase_id = '1';
+
 
 --12) ƒл€ заданного поставщика выведите в заданном магазине сотрудника, который принимал их товар наибольшее количество раз.
 
@@ -581,7 +599,25 @@ HAVING count(*) =
       GROUP BY r.worker_id) t1)
 
 --13) ѕосчитайте относительную (напр.: 25%) и абсолютную (напр.: 35 р.) наценку на каждый товар в момент последней поставки.
+ALTER TABLE registration_product ADD price bigint NOT NULL DEFAULT '200';
 
+
+UPDATE registration_product
+SET price = 20
+WHERE information = 'получение выпечки';
+
+
+UPDATE registration_product
+SET price = 400
+WHERE information = 'получение м€са';
+
+
+SELECT (pr.price/rp.price-1)*100 AS summ
+FROM product pr
+INNER JOIN product_in_store pis ON pr.id = pis.store_id
+INNER JOIN store st ON pis.store_id = st.id
+INNER JOIN registration_product rp ON st.id = rp.store_id
+WHERE pr.price = (pr.price / rp.price -1)*100
 
 --14) ѕосчитайте дл€ каждого магазина доходы и расходы на последнюю неделю. ѕодумайте, кака€ очевидна€ проблема есть в расчЄте и как можно еЄ устранить.
 
