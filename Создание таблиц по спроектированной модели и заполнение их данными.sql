@@ -1,4 +1,6 @@
+--Создание таблиц по спроектированной модели и заполнение их данными
 BEGIN;
+
 
 CREATE TABLE store (
 id serial PRIMARY KEY,
@@ -21,6 +23,11 @@ VALUES
 ('СССР', '171526', '2005-02-13', '1991-02-15', 'Tver'),
 ('Савок', '171526', '2007-09-20', '1991-02-15', 'Tver'),
 ('Патриот', '171526', '2010-07-26', NULL, 'Tver');
+
+INSERT INTO store (name, postal_code, open_date, close_date, adress)
+VALUES
+('Троечка', '171544', '2021-02-15',NULL, 'Kimry'); 
+
 
 CREATE TABLE department (
 id serial PRIMARY KEY,
@@ -107,26 +114,51 @@ registration bigint UNIQUE,
 number_phone bigint UNIQUE,
 email varchar(255)UNIQUE,
 birth_day timestamptz,
+store bigint NULL,----------
 unit_id integer REFERENCES unit (id)
 );
 
-INSERT INTO worker (name, surname, position, registration, number_phone, email,birth_day,unit_id)
+INSERT INTO worker (name, surname, position, registration, number_phone, email,birth_day, store, unit_id)
 VALUES
-('Олег', 'Петров','Директор','115431','89800553535', 'petrov@gmail.com', '1989-02-21', 1), 
-('Диман', 'Белоусов','Гендиректор','115433','89800553536', 'bel@gmail.com', '1990-02-11', 5), 
-('Влад', 'Смирнов','продавец','115437','89800553537', 'vs@gmail.com', '1989-02-26', 4), 
-('Ярик', 'Медведев','продавец','115423','89800553538', 'ya@gmail.com', '1990-04-26', 4), 
-('Славик', 'Ершов','продавец','115422','89800553539', 'clava@gmail.com', '1999-12-26', 4), 
-('Костян', 'Маслов','кладовщик','114531','89800553545', 'km@gmail.com', '1956-11-26', 2), -- 6
-('Веня', 'Аксёнов','менеджер','119431','89800553555', 'venchik@gmail.com', '1977-05-26', 6), 
-('Паша', 'Елисеев','кадровик','125431','89800553635', 'pavel@gmail.com', '1976-02-21', 3), 
-('Саня', 'Костин','HR-спец','115504','89800553575', 'kostin@gmail.com', '1987-07-16', 8), 
-('Антон', 'Брагин','Проектировщик','112221','89800553935', 'bragin@gmail.com', '1990-01-16', 5), 
-('Аноним', 'Котов','ничего не делает','215431','89820553535', 'anonymous@gmail.com', '1989-02-16', 9), 
-('Роман', 'Соколов','притворяется что работает','325431','89844553535', 'sokol@gmail.com', '1968-02-16', 10), 
-('Олег', 'Морозов','Инженер','225431','89230553535', 'oleg@gmail.com', '1986-03-26', 5), 
-('Денчик', 'Петров','Админ','445431','89430553535', 'den@gmail.com', '1987-04-26', 9); 
+('Олег', 'Петров','Директор','115431','89800553535', 'petrov@gmail.com', '1989-02-21', NULL, 1), 
+('Диман', 'Белоусов','Гендиректор','115433','89800553536', 'bel@gmail.com', '1990-02-11', NULL, 5), 
+('Влад', 'Смирнов','продавец','115437','89800553537', 'vs@gmail.com', '1989-02-26', NULL, 4), 
+('Ярик', 'Медведев','продавец','115423','89800553538', 'ya@gmail.com', '1990-04-26', NULL, 4), 
+('Славик', 'Ершов','продавец','115422','89800553539', 'clava@gmail.com', '1999-12-26', NULL, 4), 
+('Костян', 'Маслов','кладовщик','114531','89800553545', 'km@gmail.com', '1956-11-26', '2' ,2), -- 6
+('Веня', 'Аксёнов','менеджер','119431','89800553555', 'venchik@gmail.com', '1977-05-26' ,NULL, 6), 
+('Паша', 'Елисеев','кадровик','125431','89800553635', 'pavel@gmail.com', '1976-02-21', NULL, 3), 
+('Саня', 'Костин','HR-спец','115504','89800553575', 'kostin@gmail.com', '1987-07-16', NULL, 8), 
+('Антон', 'Брагин','Проектировщик','112221','89800553935', 'bragin@gmail.com', '1990-01-16', NULL, 5), 
+('Аноним', 'Котов','ничего не делает','215431','89820553535', 'anonymous@gmail.com', '1989-02-16', NULL, 9), 
+('Роман', 'Соколов','притворяется что работает','325431','89844553535', 'sokol@gmail.com', '1968-02-16', NULL, 10), 
+('Олег', 'Морозов','Инженер','225431','89230553535', 'oleg@gmail.com', '1986-03-26', NULL, 5), 
+('Денчик', 'Петров','Админ','445431','89430553535', 'den@gmail.com', '1987-04-26', NULL, 9); 
+
+
+CREATE TABLE timetable (
+id serial PRIMARY KEY,
+date_begin timestamp,
+date_finish timestamp,
+date_number timestamptz,
+worker_id integer REFERENCES worker (id)
+);
+INSERT INTO timetable (date_begin, date_finish, date_number, worker_id)
+VALUES
+('2020-05-23 09:00:00','2020-05-23 18:00:00','2020-05-23', 6),
+('2020-05-23 09:00:00','2020-05-23 18:00:00','2020-05-24', 6),
+('2020-05-23 09:00:00','2020-05-23 18:00:00','2020-05-25', 6),
+('2020-05-23 09:00:00','2020-05-23 18:00:00','2020-05-26', 6),
+('2020-05-23 09:00:00','2020-05-23 18:00:00','2020-05-27', 6),
+('2020-05-23 09:00:00','2020-05-23 18:00:00','2020-05-28', 6),
+('2020-05-23 09:00:00','2020-05-23 18:00:00','2020-05-29', 6),
+('2020-05-23 09:00:00','2020-05-23 18:00:00','2020-05-27', 5),
+('2020-05-23 09:00:00','2020-05-23 18:00:00','2020-05-28', 4),
+('2020-05-23 09:00:00','2020-05-23 18:00:00','2020-05-29', 3),
+('2020-05-23 09:00:00','2020-05-23 18:00:00','2020-05-20', 2);
+
 -------
+
 CREATE TABLE supplier (
 id serial PRIMARY KEY,
 name varchar(255),
@@ -199,6 +231,19 @@ VALUES
 ('ряженка', '2','60', 'молочный продукт', '1','1'),
 ('водка', '10','400', 'алкогольный продукт', '1','1');
 
+CREATE TABLE price_history (
+id serial PRIMARY KEY,
+price bigint,
+date timestamp,
+product_id integer REFERENCES product (id)
+);
+
+INSERT INTO price_history (price,date,product_id  )
+VALUES
+('550', '2019-05-01 20:05:06', 1),
+('600', '2019-05-04 15:05:06', 1),
+('50', '2019-05-03 15:05:06', 2),
+('55', '2019-05-11 15:05:06', 2);
 
 
 CREATE TABLE product_in_store (
@@ -282,6 +327,18 @@ VALUES
 ('2019-05-13 14:35:06', 'milk', 'money', 9),
 ('2019-05-14 15:25:06', 'milk', 'money', 10);
 
+INSERT INTO purchase (date, list_product, playment_method, client_id )
+VALUES
+('2019-05-03 19:05:06', 'мясо', 'money', 1),
+('2019-05-04 15:05:06', 'мясо', 'money', 1),
+('2019-05-04 17:05:06', 'мясо', 'money', 1);
+
+INSERT INTO purchase (date, list_product, playment_method, client_id )
+VALUES
+('2019-05-03 19:05:06', 'milk', 'money', 2),
+('2019-05-04 15:05:06', 'milk', 'money', 2);
+
+
 CREATE TABLE purchase_product (
 amount integer,
 purchase_id integer,
@@ -300,6 +357,17 @@ VALUES
 ('3', 8,2),
 ('2', 9,2),
 ('1', 10,2);
+
+INSERT INTO purchase_product (amount, purchase_id, product_id )
+VALUES
+('1', 14,2),
+('1', 15,2);
+
+INSERT INTO purchase_product (amount, purchase_id, product_id )
+VALUES
+('1', 11,1),
+('1', 12,1),
+('1', 13,1);
 
 ----
 CREATE TABLE discount (
@@ -368,3 +436,169 @@ VALUES
 
 
 COMMIT;
+
+--- Запросы на спроектированную БД
+--1) Для заданного города выведите ближайшие открытия магазинов
+SELECT *
+FROM store st
+WHERE now() < st.open_date
+  AND st.adress = 'Kimry'
+ORDER BY st.open_date
+
+-- 2) Для заданного магазина вывести расписание работы его сотрудников на завтрашний день.
+
+SELECT w.name,
+       t.date_begin,
+       t.date_finish
+FROM worker w
+INNER JOIN timetable t ON w.id = t.id
+WHERE w.store = 2
+  AND t.date_number > now()::date - (24/24)::integer -- ближайшая дата 23 числа, примерно (24*7/24)
+
+-- 3) Выведите клиентов, которые в любых магазинах компании за последние 14 дней потратили более 10000 рублей на покупки
+SELECT cl.id AS c,
+       cl.name AS n,
+       count(DISTINCT pu.id)::real AS pushes,
+       sum(pr.price) AS s
+FROM client cl
+INNER JOIN purchase pu ON cl.id = pu.client_id
+INNER JOIN purchase_product pp ON pu.id = pp.purchase_id
+INNER JOIN product pr ON pp.product_id = pr.id
+INNER JOIN price_history ph ON ph.product_id = pr.id
+WHERE pu.date > now()::date - (336/24)::integer
+GROUP BY cl.id
+ORDER BY sum(pr.price)>10000 DESC
+
+-- 4) Выведите 30% (можете увеличить процент) клиентов, которые потратили за последние 240 часов наибольшую сумму.
+
+select cl.id as c, cl.name as n, count(Distinct pu.id)::real as pushes, sum(pr.price) as s
+	from client cl
+	inner join purchase pu ON cl.id = pu.client_id
+	inner join purchase_product pp ON pu.id = pp.purchase_id
+	inner join product pr ON pp.product_id = pr.id
+	inner join price_history ph ON ph.product_id = pr.id
+	where pu.date > now()::date - (11140/24)::integer
+	group by cl.id
+    ORDER BY sum(pr.price) DESC
+
+-- 5) На основе предыдущего запроса (сделайте его WITH) посчитайте среднюю сумму, потраченную этими клиентами.
+
+WITH all_client AS
+  (SELECT cl.id AS c, cl.name AS n, count(pu.id)::real AS pushes
+   FROM client cl
+   INNER JOIN purchase pu ON cl.id = pu.client_id
+   WHERE pu.date > now()::date - (11140/24)::integer
+   GROUP BY cl.id),
+     client_with_purchase AS
+  (SELECT cl.id AS c, cl.name AS n, count(pu.id)::real AS pushes, sum(pr.price) AS s, pr.price, avg(pr.price)
+   FROM client cl
+   INNER JOIN purchase pu ON cl.id = pu.client_id
+   INNER JOIN purchase_product pp ON pu.id = pp.purchase_id
+   INNER JOIN product pr ON pp.product_id = pr.id
+   GROUP BY cl.id, pr.price
+   ORDER BY sum(pr.price) DESC --   limit 3
+),
+     average_amount AS
+  (SELECT cwp.c AS c, avg(s) AS av
+   FROM client_with_purchase cwp --where cwp.s/cwp.pushes
+
+   GROUP BY cwp.c)
+SELECT DISTINCT a_c.n, max(cwp.s), aa.av
+FROM all_client a_c
+INNER JOIN client_with_purchase cwp ON a_c.pushes = cwp.pushes
+INNER JOIN average_amount aa ON cwp.c = aa.c
+WHERE cwp.c/a_c.c>0.3
+GROUP BY a_c.n, aa.av
+ORDER BY max(cwp.s) DESC
+
+-- 6) За последние 4 недели выведите проданное количество единиц товара (В формате: ID, Название товара, 1,2,3, 4 недели).
+
+select pr.id, pr.name, pp.amount, pu.date,pu.date > now()::date - (11140/24)::integer as "1",
+    pu.date > now()::date - (11040/24)::integer as "2", pu.date > now()::date - (10000/24)::integer as "3",
+    pu.date > now()::date - (9000/24)::integer as "4"
+	from product pr
+	inner join purchase_product pp ON pr.id = pp.purchase_id
+	inner join purchase pu ON pp.purchase_id = pu.id
+-- 7) Сравните количество единиц товара на складе с полученными в результате предыдущего запроса данными. Вывести нужно те товары и их количество, которого не хватит на неделю исходя из статистики 4-х прошедших недель
+
+SELECT rp.information,
+       rp.waybill
+FROM store st
+INNER JOIN registration_product rp ON st.id = rp.store_id
+INNER JOIN
+  (SELECT pr.id,
+          pr.name,
+          pp.amount AS amount,
+          pu.date,
+          pu.date > now()::date - (11140/24)::integer AS "1",
+          pu.date > now()::date - (11040/24)::integer AS "2",
+          pu.date > now()::date - (10000/24)::integer AS "3",
+          pu.date > now()::date - (9000/24)::integer AS "4"
+   FROM product pr
+   INNER JOIN purchase_product pp ON pr.id = pp.purchase_id
+   INNER JOIN purchase pu ON pp.purchase_id = pu.id) t ON rp.waybill = t.amount
+
+-- 8) Для заданного сотрудника выведите его месячный график работы.
+
+SELECT w.name,
+       t.worker_id,
+       t.date_number
+FROM worker w
+INNER JOIN timetable t ON w.id = t.worker_id
+WHERE w.id = 6
+
+-- 9) Для всех товаров в магазине выведите цену в таком виде:
+
+--
+
+--10) Для каждого клиента найдите самый частый день недели и время его посещения магазина.
+
+SELECT cl.id, pu.date, 
+FROM client cl
+INNER JOIN purchase pu ON  cl.id = pu.client_id
+
+-- 11) Клиент может отказаться от карты лояльности, в таком случае, согласно GDPR хранить его данные нельзя.
+-- Объясните, как правильно организовать такое удаление, напишите запрос(ы).
+
+--
+
+--12) Для заданного поставщика выведите в заданном магазине сотрудника, который принимал их товар наибольшее количество раз.
+
+SELECT r.worker_id,
+       count(*) AS prinyal_raz
+FROM registration_product r
+WHERE r.store_id = 6
+  AND supplier_id = 11
+GROUP BY r.worker_id
+HAVING count(*) =
+  (SELECT max(prinyal_raz)
+   FROM
+     (SELECT r.worker_id,
+             count(*) AS prinyal_raz
+      FROM registration_product r
+      WHERE r.store_id = 6
+        AND supplier_id = 11
+      GROUP BY r.worker_id) t1)
+
+--13) Посчитайте относительную (напр.: 25%) и абсолютную (напр.: 35 р.) наценку на каждый товар в момент последней поставки.
+
+
+--14) Посчитайте для каждого магазина доходы и расходы на последнюю неделю. Подумайте, какая очевидная проблема есть в расчёте и как можно её устранить.
+
+
+--15) Появилась задача хранить зарплаты сотрудников. Подумайте, как можно это хранить и напишите запрос для изменения базы данных. Бухгалтерия сообщила, что самая распространённая з/п - 30000, 
+
+ALTER TABLE worker ADD salary bigint NOT NULL DEFAULT '30000';
+
+
+UPDATE worker
+SET salary = 25000
+WHERE POSITION = 'продавец';
+
+
+UPDATE worker
+SET salary = 35000
+WHERE name = 'Oleg';
+
+
+
