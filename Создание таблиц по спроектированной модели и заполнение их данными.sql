@@ -1,4 +1,6 @@
 ﻿--Создание таблиц по спроектированной модели и заполнение их данными
+
+--------------------------------------------------
 BEGIN;
 
 
@@ -185,27 +187,26 @@ VALUES
 CREATE TABLE registration_product (
 id serial PRIMARY KEY,
 information varchar(255),
-waybill integer,
+price bigint,
+amount integer,
+date timestamp,
 requisites varchar(255) UNIQUE,
 worker_id integer REFERENCES worker (id),
 store_id integer REFERENCES store (id),
 supplier_id integer REFERENCES supplier (id)
 );
-INSERT INTO registration_product (information, waybill, requisites, worker_id, store_id, supplier_id )
+INSERT INTO registration_product (information, price, amount,date, requisites, worker_id, store_id, supplier_id )
 VALUES
-('получение мяса', '100','general in mir1', 6, 4, 3),
-('получение молочки', '50','general in trud1', 6, 5, 1),
-('получение выпечки', '20','general in may1', 6, 6, 5),
-('получение выпечки', '25','general in mir2', 6, 4, 6),
-('получение мяса', '56','general in 22trud', 6, 5, 7),
-('получение мяса', '234','general in 33may2', 6, 6, 8),
-('получение мяса', '12','general in 44mir3', 6, 4, 9),
-('получение мяса', '33','general in 55trud2', 6, 5, 10),
-('получение мяса', '656','general in66 may3', 6, 6, 10),
-('получение мяса', '33','general in 77mir4', 6, 4, 11),
-('получение алкоголя', '100','general in 88trud2', 6, 5, 11),
-('получение алкоголя', '100','general in 99may4', 6, 6, 11),
-('получение алкоголя', '100','general in 00may5', 6, 6, 11);
+('мясо', '250', '10', '2020-05-01 20:05:06', 'general in mir1', 6, 4, 3),
+('молоко', '20', '25', '2020-05-01 20:05:06', 'general in trud1', 6, 5, 1),
+('хлеб', '10', '10', '2020-05-01 20:05:06', 'general in may1', 6, 6, 5),
+('булочка', '10', '10', '2020-05-01 20:05:06', 'general in mir2', 6, 4, 6),
+('пряники', '15', '10', '2020-05-01 20:05:06', 'general in 22trud', 6, 5, 7),
+('картошка', '20', '10', '2020-05-01 20:05:06', 'general in 33may2', 6, 6, 8),
+('сок', '40', '10', '2020-05-01 20:05:06', 'general in 44mir3', 6, 6, 10),
+('колбаса', '90', '10', '2020-05-01 20:05:06', 'general in 55trud2', 6, 6, 10),
+('ряженка', '30', '10', '2020-05-01 20:05:06', 'general in66 may3', 6, 6, 10),
+('водка', '100', '10', '2020-05-01 20:05:06', 'general in 00may5', 6, 6, 11);
 
 -------
 CREATE TABLE product (
@@ -240,10 +241,17 @@ product_id integer REFERENCES product (id)
 
 INSERT INTO price_history (price,date,product_id  )
 VALUES
-('550', '2019-05-01 20:05:06', 1),
-('600', '2019-05-04 15:05:06', 1),
-('50', '2019-05-03 15:05:06', 2),
-('55', '2019-05-11 15:05:06', 2);
+('550', '2020-05-27 20:05:06', 1),
+('600', '2020-06-03 15:05:06', 1),
+('50', '2020-05-22 15:05:06', 2),
+('55', '2020-05-28 15:05:06', 2),
+('39', '2020-05-22 15:05:06', 3),
+('65', '2020-05-29 15:05:06', 3),
+('50', '2020-05-28 15:05:06', 10),
+('50', '2020-06-07 15:05:06', 10),
+('399', '2020-05-27 15:05:06', 7),
+('450', '2020-06-03 15:05:06', 7);
+
 
 
 CREATE TABLE product_in_store (
@@ -316,27 +324,27 @@ client_id integer REFERENCES client (id)
 );
 INSERT INTO purchase (date, list_product, playment_method, client_id )
 VALUES
-('2019-05-03 15:05:06', 'milk', 'money', 1),
-('2019-05-04 15:45:06', 'milk', 'money', 2),
-('2019-05-05 09:05:06', 'milk', 'card', 3),
-('2019-05-06 14:05:06', 'milk', 'card', 4),
-('2019-05-07 16:23:06', 'milk', 'money', 5),
-('2019-05-09 11:15:06', 'milk', 'card', 6),
-('2019-05-11 12:01:06', 'milk', 'card', 7),
-('2019-05-12 13:02:06', 'milk', 'money', 8),
-('2019-05-13 14:35:06', 'milk', 'money', 9),
-('2019-05-14 15:25:06', 'milk', 'money', 10);
+('2020-05-03 15:05:06', 'milk', 'money', 1),
+('2020-05-25 15:45:06', 'milk', 'money', 2),
+('2020-05-04 09:05:06', 'milk', 'card', 3),
+('2020-05-06 14:05:06', 'milk', 'card', 4),
+('2020-05-14 16:23:06', 'milk', 'money', 5),
+('2020-05-09 11:15:06', 'milk', 'card', 6),
+('2020-05-12 12:01:06', 'milk', 'card', 7),
+('2020-05-12 13:02:06', 'milk', 'money', 8),
+('2020-05-30 14:35:06', 'milk', 'money', 9),
+('2020-05-20 15:25:06', 'milk', 'money', 10);
 
 INSERT INTO purchase (date, list_product, playment_method, client_id )
 VALUES
-('2019-05-03 19:05:06', 'мясо', 'money', 1),
-('2019-05-04 15:05:06', 'мясо', 'money', 1),
-('2019-05-04 17:05:06', 'мясо', 'money', 1);
+('2020-05-03 15:05:06', 'мясо', 'money', 1),
+('2020-05-31 15:05:06', 'мясо', 'money', 1),
+('2020-06-01 17:05:06', 'мясо', 'money', 1);
 
 INSERT INTO purchase (date, list_product, playment_method, client_id )
 VALUES
-('2019-05-03 19:05:06', 'milk', 'money', 2),
-('2019-05-04 15:05:06', 'milk', 'money', 2);
+('2020-05-26 19:05:06', 'milk', 'money', 2),
+('2020-05-27 15:05:06', 'milk', 'money', 2);
 
 
 CREATE TABLE purchase_product (
@@ -437,14 +445,16 @@ VALUES
 
 COMMIT;
 
---- Запросы на спроектированную БД
+
+-------------------- Запросы на спроектированную БД---------------------------
+
 --1) Для заданного города выведите ближайшие открытия магазинов
+
 SELECT *
 FROM store st
 WHERE now() < st.open_date
   AND st.adress = 'Kimry'
-ORDER BY st.open_date
-
+ORDER BY st.open_date;
 -- 2) Для заданного магазина вывести расписание работы его сотрудников на завтрашний день.
 
 SELECT w.name,
@@ -453,70 +463,71 @@ SELECT w.name,
 FROM worker w
 INNER JOIN timetable t ON w.id = t.id
 WHERE w.store = 2
-  AND t.date_number > now()::date - (24/24)::integer -- ближайшая дата 23 числа, примерно (24*7/24)
+  AND t.date_number > now()::date + (1)::integer ;
+-- ближайшая дата 23.05 последней записи , примерно - (30)::integer
 
--- 3) Выведите клиентов, которые в любых магазинах компании за последние 14 дней потратили более 10000 рублей на покупки
-SELECT cl.id AS c,
-       cl.name AS n,
-       count(DISTINCT pu.id)::real AS pushes,
-       sum(pr.price) AS s
-FROM client cl
-INNER JOIN purchase pu ON cl.id = pu.client_id
-INNER JOIN purchase_product pp ON pu.id = pp.purchase_id
-INNER JOIN product pr ON pp.product_id = pr.id
-INNER JOIN price_history ph ON ph.product_id = pr.id
-WHERE pu.date > now()::date - (336/24)::integer
-GROUP BY cl.id
-ORDER BY sum(pr.price)>10000 DESC
+-- 3) Выведите клиентов, которые в любых магазинах компании за последние 14 дней потратили более 10000 рублей на покупки.
 
--- 4) Выведите 30% (можете увеличить процент) клиентов, которые потратили за последние 240 часов наибольшую сумму.
-
-select cl.id as c, cl.name as n, count(Distinct pu.id)::real as pushes, sum(pr.price) as s
+	select cl.id as c, cl.name as n, count(Distinct pu.id)::real as pushes, sum(pr.price) as s
 	from client cl
 	inner join purchase pu ON cl.id = pu.client_id
 	inner join purchase_product pp ON pu.id = pp.purchase_id
 	inner join product pr ON pp.product_id = pr.id
 	inner join price_history ph ON ph.product_id = pr.id
-	where pu.date > now()::date - (11140/24)::integer
+	where pu.date > now()::date - (14)::integer
+	group by cl.id
+	Having sum(pr.price)>10000
+    ORDER BY sum(pr.price) DESC;
+--таковых нет, так как макимум 2000
+
+-- 4) Выведите 10% (можете увеличить процент) клиентов, которые потратили за последние 240 часов наибольшую сумму.
+
+	select cl.id, cl.name as n, count(Distinct pu.id)::real as pushes, sum(pr.price) as summ
+	from client cl
+	inner join purchase pu ON cl.id = pu.client_id
+	inner join purchase_product pp ON pu.id = pp.purchase_id
+	inner join product pr ON pp.product_id = pr.id
+	inner join price_history ph ON ph.product_id = pr.id
+	where pu.date > now()::date - (240/24)::integer
 	group by cl.id
     ORDER BY sum(pr.price) DESC
+  limit (SELECT COUNT (*)/10 FROM CLIENT);
 
 -- 5) На основе предыдущего запроса (сделайте его WITH) посчитайте среднюю сумму, потраченную этими клиентами.
 
-WITH all_client AS
-  (SELECT cl.id AS c, cl.name AS n, count(pu.id)::real AS pushes
-   FROM client cl
-   INNER JOIN purchase pu ON cl.id = pu.client_id
-   WHERE pu.date > now()::date - (11140/24)::integer
-   GROUP BY cl.id),
-     client_with_purchase AS
-  (SELECT cl.id AS c, cl.name AS n, count(pu.id)::real AS pushes, sum(pr.price) AS s, pr.price, avg(pr.price)
+WITH top_client AS
+  (SELECT cl.id AS i,
+          cl.name AS n,
+          count(DISTINCT pu.id)::numeric AS pushes,
+          sum(pr.price) AS summ
    FROM client cl
    INNER JOIN purchase pu ON cl.id = pu.client_id
    INNER JOIN purchase_product pp ON pu.id = pp.purchase_id
    INNER JOIN product pr ON pp.product_id = pr.id
-   GROUP BY cl.id, pr.price
-   ORDER BY sum(pr.price) DESC --   limit 3
-),
-     average_amount AS
-  (SELECT cwp.c AS c, avg(s) AS av
-   FROM client_with_purchase cwp --where cwp.s/cwp.pushes
-
-   GROUP BY cwp.c)
-SELECT DISTINCT a_c.n, max(cwp.s), aa.av
-FROM all_client a_c
-INNER JOIN client_with_purchase cwp ON a_c.pushes = cwp.pushes
-INNER JOIN average_amount aa ON cwp.c = aa.c
-WHERE cwp.c/a_c.c>0.3
-GROUP BY a_c.n, aa.av
-ORDER BY max(cwp.s) DESC
+   INNER JOIN price_history ph ON ph.product_id = pr.id
+   WHERE pu.date > now()::date - (240/24)::integer
+   GROUP BY cl.id
+   ORDER BY sum(pr.price) DESC
+   LIMIT
+     (SELECT COUNT (*)/10
+      FROM CLIENT)
+), average_amount AS
+  (SELECT tc.i AS i,
+          tc.n AS n,
+          tc.summ AS average
+   FROM top_client tc)
+SELECT aa.n,
+       (aa.average/tc.pushes)::real AS average_amount
+FROM top_client tc
+INNER JOIN average_amount aa ON tc.i = aa.i
+AND tc.summ = aa.average;
 
 -- 6) За последние 4 недели выведите проданное количество единиц товара (В формате: ID, Название товара, 1,2,3, 4 недели).
 
 SELECT pr.id,
        pr.name,
        CASE
-           WHEN pu.date < now()  AND pu.date > now()::date - (7)::integer THEN pp.amount
+           WHEN pu.date < now() AND pu.date > now()::date - (7)::integer THEN pp.amount
        END AS "1 неделя",
        CASE
            WHEN pu.date < now()::date - (7)::integer AND pu.date > now()::date - (14)::integer THEN pp.amount
@@ -529,21 +540,23 @@ SELECT pr.id,
        END AS "4 неделя"
 FROM product pr
 INNER JOIN purchase_product pp ON pr.id = pp.purchase_id
+INNER JOIN purchase pu ON pp.purchase_id = pu.id;
+
+-- 7) Сравните количество единиц товара на складе с полученными в результате предыдущего запроса данными. Вывести нужно те товары и их количество, которого не хватит на неделю исходя из статистики 4-х прошедших недель.
+
+SELECT pr.id,
+       pr.name,
+       rp.amount,
+       CASE
+           WHEN pu.date < now()::date AND pu.date > now()::date - (28)::integer THEN pp.amount
+       END AS "4 неделя"
+FROM product pr
+INNER JOIN purchase_product pp ON pr.id = pp.purchase_id
 INNER JOIN purchase pu ON pp.purchase_id = pu.id
---там все даты заказов были в 19 году
-
--- 7) Сравните количество единиц товара на складе с полученными в результате предыдущего запроса данными. Вывести нужно те товары и их количество, которого не хватит на неделю исходя из статистики 4-х прошедших недель
-
-SELECT rp.information,
-       rp.waybill
-FROM registration_product rp
-INNER JOIN
-  (SELECT pr.id,
-          pr.name,
-          pp.amount AS amount
-   FROM product pr
-   INNER JOIN purchase_product pp ON pr.id = pp.purchase_id
-   INNER JOIN purchase pu ON pp.purchase_id = pu.id) t ON rp.waybill = t.amount
+INNER JOIN product_in_store pis ON pr.id = pis.product_id
+INNER JOIN registration_product rp ON pis.product_id = rp.id
+WHERE rp.amount<pp.amount;
+----таковых нет, так как под условие WHERE (rp.amount<pp.amount) никто не попал
 
 -- 8) Для заданного сотрудника выведите его месячный график работы.
 
@@ -553,31 +566,94 @@ SELECT w.name,
 FROM worker w
 INNER JOIN timetable t ON w.id = t.worker_id
 WHERE w.id = 6
+  AND t.date_number BETWEEN '2020/05/01' AND '2020/05/31';
 
 -- 9) Для всех товаров в магазине выведите цену в таком виде:
 
---
+  SELECT product.id,
+         product.name,
+         CASE
+             WHEN second_week.price IS NULL THEN 'нет инф.'
+             ELSE second_week.price::varchar
+         END AS "-2 недели",
+         CASE
+             WHEN first_week.price IS NULL THEN 'нет инф.'
+             ELSE first_week.price::varchar
+         END AS "-1 недели",
+         CASE
+             WHEN current_week.price IS NULL THEN 'нет инф.'
+             ELSE current_week.price::varchar
+         END AS "Текущая",
+         CASE
+             WHEN next_week.price IS NULL THEN 'нет инф.'
+             ELSE next_week.price::varchar
+         END AS "След неделя",
+         CASE
+             WHEN after_2_week.price IS NULL THEN 'нет инф.'
+             ELSE after_2_week.price::varchar
+         END AS "+2 недели"
+  FROM product
+  LEFT JOIN
+    (SELECT *
+     FROM price_history
+     WHERE date < now()::date - (7)::integer AND date > now()::date - (14)::integer ) second_week ON product.id = second_week.product_id
+  LEFT JOIN
+    (SELECT *
+     FROM price_history
+     WHERE date < now() AND date > now()::date - (7)::integer ) first_week ON product.id = first_week.product_id
+  LEFT JOIN
+    (SELECT *
+     FROM price_history
+     WHERE date > now() AND date < now()::date + (7)::integer ) current_week ON product.id = current_week.product_id
+  LEFT JOIN
+    (SELECT *
+     FROM price_history
+     WHERE date > now()::date + (7)::integer AND date < now()::date + (14)::integer ) next_week ON product.id = next_week.product_id
+  LEFT JOIN
+    (SELECT *
+     FROM price_history
+     WHERE date > now()::date + (14)::integer AND date < now()::date + (21)::integer ) after_2_week ON product.id = after_2_week.product_id;
 
 --10) Для каждого клиента найдите самый частый день недели и время его посещения магазина.
 
-SELECT cl.id, pu.date, 
+SELECT CASE
+           WHEN extract(dow FROM pu.date::TIMESTAMP) = 1 THEN cl.id
+       END AS "пн",
+       CASE
+           WHEN extract(dow FROM pu.date::TIMESTAMP) = 2 THEN cl.id
+       END AS "вт",
+       CASE
+           WHEN extract(dow FROM pu.date::TIMESTAMP) = 3 THEN cl.id
+       END AS "ср",
+       CASE
+           WHEN extract(dow FROM pu.date::TIMESTAMP) = 4 THEN cl.id
+       END AS "чт",
+       CASE
+           WHEN extract(dow FROM pu.date::TIMESTAMP) = 5 THEN cl.id
+       END AS "пт",
+       CASE
+           WHEN extract(dow FROM pu.date::TIMESTAMP) = 6 THEN cl.id
+       END AS "сб",
+       CASE
+           WHEN extract(dow FROM pu.date::TIMESTAMP) = 0 THEN cl.id
+       END AS "вс"
 FROM client cl
-INNER JOIN purchase pu ON  cl.id = pu.client_id
+INNER JOIN purchase pu ON cl.id = pu.client_id;
 
 -- 11) Клиент может отказаться от карты лояльности, в таком случае, согласно GDPR хранить его данные нельзя.
 -- Объясните, как правильно организовать такое удаление, напишите запрос(ы).
 
+BEGIN;
+
+UPDATE purchase
+SET client_id = NULL
+WHERE id = '10';
+
 DELETE
 FROM client
-WHERE id = '1';
+WHERE id = '10';
 
-DELETE
-FROM purchase
-WHERE client_id = '1';
-
-DELETE
-FROM purchase_product
-WHERE purchase_id = '1';
+COMMIT;
 
 
 --12) Для заданного поставщика выведите в заданном магазине сотрудника, который принимал их товар наибольшее количество раз.
@@ -586,7 +662,7 @@ SELECT r.worker_id,
        count(*) AS prinyal_raz
 FROM registration_product r
 WHERE r.store_id = 6
-  AND supplier_id = 11
+  AND supplier_id = 10
 GROUP BY r.worker_id
 HAVING count(*) =
   (SELECT max(prinyal_raz)
@@ -595,46 +671,58 @@ HAVING count(*) =
              count(*) AS prinyal_raz
       FROM registration_product r
       WHERE r.store_id = 6
-        AND supplier_id = 11
-      GROUP BY r.worker_id) t1)
+        AND supplier_id = 10
+      GROUP BY r.worker_id) t1); 
 
 --13) Посчитайте относительную (напр.: 25%) и абсолютную (напр.: 35 р.) наценку на каждый товар в момент последней поставки.
-ALTER TABLE registration_product ADD price bigint NOT NULL DEFAULT '200';
 
-
-UPDATE registration_product
-SET price = 20
-WHERE information = 'получение выпечки';
-
-
-UPDATE registration_product
-SET price = 400
-WHERE information = 'получение мяса';
-
-
-SELECT (pr.price/rp.price-1)*100 AS summ
+SELECT rp.id,
+       rp.information,
+       rp.price,
+       pr.price,
+       sum(pr.price - rp.price) AS "абсолютная наценка",
+       ((pr.price - rp.price)/rp.price)*100 AS "странные проценты"
 FROM product pr
-INNER JOIN product_in_store pis ON pr.id = pis.store_id
-INNER JOIN store st ON pis.store_id = st.id
-INNER JOIN registration_product rp ON st.id = rp.store_id
-WHERE pr.price = (pr.price / rp.price -1)*100
+INNER JOIN product_in_store pis ON pr.id = pis.product_id
+INNER JOIN registration_product rp ON pis.product_id = rp.id
+WHERE rp.date BETWEEN '2020/05/01' AND '2020/05/5'
+GROUP BY rp.id,
+         rp.information,
+         rp.price,
+         pr.price ;
 
 --14) Посчитайте для каждого магазина доходы и расходы на последнюю неделю. Подумайте, какая очевидная проблема есть в расчёте и как можно её устранить.
 
+SELECT rp.id,
+       rp.information,
+       rp.price,
+       pr.price,
+       pp.amount,
+       (pr.price - rp.price)*pp.amount AS "доход"
+FROM product pr
+INNER JOIN purchase_product pp ON pr.id = pp.product_id
+INNER JOIN purchase pu ON pp.product_id = pu.id
+INNER JOIN product_in_store pis ON pr.id = pis.product_id
+INNER JOIN registration_product rp ON pis.product_id = rp.id
+WHERE pu.date < now()
+  AND pu.date > now()::date - (7)::integer
+  AND rp.date < now()
+  AND rp.date > now()::date - (35)::integer;
+
+--AND rp.date > now()::date - (35)::integer - потому что в начале мая был привоз
 
 --15) Появилась задача хранить зарплаты сотрудников. Подумайте, как можно это хранить и напишите запрос для изменения базы данных. Бухгалтерия сообщила, что самая распространённая з/п - 30000, 
 
-ALTER TABLE worker ADD salary bigint NOT NULL DEFAULT '30000';
+BEGIN;
 
+ALTER TABLE worker ADD salary bigint NOT NULL DEFAULT '30000';
 
 UPDATE worker
 SET salary = 25000
-WHERE POSITION = 'продавец';
-
+WHERE position = 'продавец';
 
 UPDATE worker
 SET salary = 35000
 WHERE name = 'Oleg';
 
-
-
+COMMIT;
